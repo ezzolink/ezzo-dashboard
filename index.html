@@ -78,8 +78,55 @@ tr:hover td { background: rgba(0,212,255,0.05); }
 .footer { text-align: center; padding: 30px; color: #555; font-size: 0.8rem; }
 
 @media (max-width: 768px) {
-  .chart-container { grid-template-columns: 1fr; }
-  .kpi-grid { grid-template-columns: 1fr 1fr; }
+  .header { padding: 15px; }
+  .header h1 { font-size: 1.3rem; }
+  .header p { font-size: 0.75rem; }
+  .container { padding: 10px; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; margin: 15px 0; }
+  .kpi-card { padding: 15px; border-radius: 12px; }
+  .kpi-label { font-size: 0.7rem; }
+  .kpi-value { font-size: 1.5rem; }
+  .kpi-sub { font-size: 0.65rem; }
+  .chart-container { grid-template-columns: 1fr; gap: 12px; }
+  .section { padding: 15px; margin: 12px 0; border-radius: 12px; }
+  .section h2 { font-size: 1.05rem; margin-bottom: 12px; }
+  .bar-chart { height: 150px; gap: 8px; padding: 10px; }
+  .bar { width: 30px; }
+  .bar-label { font-size: 0.6rem; }
+  .bar-value { font-size: 0.65rem; }
+  .donut { width: 140px; height: 140px; }
+  .donut-center .big { font-size: 1.2rem; }
+  .donut-center .small { font-size: 0.65rem; }
+  .legend { gap: 10px; }
+  .legend-item { font-size: 0.7rem; }
+  .progress-header { font-size: 0.75rem; flex-direction: column; gap: 2px; }
+  .progress-bar { height: 6px; }
+
+  /* Tabela com scroll horizontal */
+  .section:has(table) { overflow-x: auto; padding: 10px; }
+  table { font-size: 0.75rem; min-width: 600px; }
+  th { padding: 8px 10px; font-size: 0.65rem; }
+  td { padding: 8px 10px; font-size: 0.7rem; }
+  .badge { font-size: 0.6rem; padding: 3px 8px; }
+
+  /* Timeline compacto */
+  .timeline { padding-left: 22px; }
+  .timeline-item { margin-bottom: 15px; }
+  .timeline-item::before { left: -18px; width: 10px; height: 10px; }
+  .timeline-date { font-size: 0.7rem; }
+  .timeline-title { font-size: 0.85rem; }
+  .timeline-meta { font-size: 0.7rem; }
+
+  .footer { padding: 15px; font-size: 0.65rem; }
+}
+
+@media (max-width: 400px) {
+  .kpi-grid { grid-template-columns: 1fr; }
+  .kpi-value { font-size: 1.3rem; }
+  .bar-chart { height: 120px; }
+  .bar { width: 22px; }
+  .donut { width: 120px; height: 120px; }
+  .header h1 { font-size: 1.1rem; }
 }
 </style>
 </head>
@@ -175,6 +222,7 @@ tr:hover td { background: rgba(0,212,255,0.05); }
   <!-- Invoice Table -->
   <div class="section">
     <h2>Faturas</h2>
+    <div style="overflow-x:auto; -webkit-overflow-scrolling: touch;">
     <table>
       <thead>
         <tr>
@@ -244,6 +292,7 @@ tr:hover td { background: rgba(0,212,255,0.05); }
         </tr>
       </tbody>
     </table>
+    </div>
   </div>
 
   <!-- Timeline -->
