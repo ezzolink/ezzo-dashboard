@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EZZO Dashboard - Elias Sebastiao</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', sans-serif; background: #0f0f23; color: #e0e0e0; min-height: 100vh; }
+.header { background: linear-gradient(135deg, #1a1a3e, #2d2d6b); padding: 30px; text-align: center; border-bottom: 3px solid #00d4ff; }
+.header h1 { font-size: 2rem; color: #00d4ff; }
+.header p { color: #888; margin-top: 5px; }
+.container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+
+/* KPI Cards */
+.kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 25px 0; }
+.kpi-card { background: linear-gradient(145deg, #1a1a3e, #16162e); border-radius: 16px; padding: 25px; border: 1px solid #2a2a5a; transition: transform 0.2s, box-shadow 0.2s; }
+.kpi-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,212,255,0.15); }
+.kpi-label { font-size: 0.85rem; color: #888; text-transform: uppercase; letter-spacing: 1px; }
+.kpi-value { font-size: 2.2rem; font-weight: 700; margin: 8px 0; }
+.kpi-value.green { color: #00ff88; }
+.kpi-value.blue { color: #00d4ff; }
+.kpi-value.orange { color: #ffaa00; }
+.kpi-value.red { color: #ff4466; }
+.kpi-sub { font-size: 0.8rem; color: #666; }
+
+/* Sections */
+.section { background: #16162e; border-radius: 16px; padding: 25px; margin: 20px 0; border: 1px solid #2a2a5a; }
+.section h2 { color: #00d4ff; font-size: 1.3rem; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+
+/* Table */
+table { width: 100%; border-collapse: collapse; }
+th { text-align: left; padding: 12px 15px; background: #1a1a3e; color: #00d4ff; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
+td { padding: 12px 15px; border-bottom: 1px solid #2a2a5a; }
+tr:hover td { background: rgba(0,212,255,0.05); }
+.badge { padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+.badge-pending { background: rgba(255,68,102,0.2); color: #ff4466; }
+.badge-done { background: rgba(0,255,136,0.2); color: #00ff88; }
+.badge-upcoming { background: rgba(0,212,255,0.2); color: #00d4ff; }
+
+/* Timeline */
+.timeline { position: relative; padding-left: 30px; }
+.timeline::before { content: ''; position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #2a2a5a; }
+.timeline-item { position: relative; margin-bottom: 25px; }
+.timeline-item::before { content: ''; position: absolute; left: -26px; top: 5px; width: 12px; height: 12px; border-radius: 50%; border: 2px solid #00d4ff; background: #0f0f23; }
+.timeline-item.active::before { background: #00d4ff; box-shadow: 0 0 10px rgba(0,212,255,0.5); }
+.timeline-date { font-size: 0.8rem; color: #00d4ff; font-weight: 600; }
+.timeline-title { font-size: 1rem; margin-top: 3px; }
+.timeline-meta { font-size: 0.8rem; color: #888; margin-top: 2px; }
+
+/* Chart area */
+.chart-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0; }
+.bar-chart { display: flex; align-items: flex-end; gap: 15px; height: 200px; padding: 20px; }
+.bar-group { display: flex; flex-direction: column; align-items: center; flex: 1; }
+.bar { width: 40px; border-radius: 6px 6px 0 0; transition: height 0.8s ease; }
+.bar.received { background: linear-gradient(to top, #00ff88, #00cc66); }
+.bar.pending { background: linear-gradient(to top, #ff4466, #cc3355); }
+.bar.projected { background: linear-gradient(to top, #00d4ff, #0099cc); }
+.bar-label { font-size: 0.7rem; color: #888; margin-top: 8px; text-align: center; }
+.bar-value { font-size: 0.75rem; color: #ccc; margin-bottom: 4px; }
+
+/* Donut */
+.donut-container { display: flex; justify-content: center; align-items: center; flex-direction: column; }
+.donut { width: 180px; height: 180px; border-radius: 50%; position: relative; }
+.donut-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); text-align: center; }
+.donut-center .big { font-size: 1.5rem; font-weight: 700; color: #00d4ff; }
+.donut-center .small { font-size: 0.75rem; color: #888; }
+.legend { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; }
+.legend-item { display: flex; align-items: center; gap: 6px; font-size: 0.8rem; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+/* Progress bars */
+.progress-item { margin-bottom: 15px; }
+.progress-header { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 0.85rem; }
+.progress-bar { height: 8px; background: #2a2a5a; border-radius: 4px; overflow: hidden; }
+.progress-fill { height: 100%; border-radius: 4px; transition: width 1s ease; }
+
+.footer { text-align: center; padding: 30px; color: #555; font-size: 0.8rem; }
+
+@media (max-width: 768px) {
+  .chart-container { grid-template-columns: 1fr; }
+  .kpi-grid { grid-template-columns: 1fr 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>EZZO Dashboard</h1>
+  <p>Elias Sebastiao | Gestao Financeira & Eventos | Maio 2026</p>
+</div>
+
+<div class="container">
+
+  <!-- KPI Cards -->
+  <div class="kpi-grid">
+    <div class="kpi-card">
+      <div class="kpi-label">Facturacao Bruta</div>
+      <div class="kpi-value blue">390.000 Kz</div>
+      <div class="kpi-sub">6 facturas emitidas</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Total Liquido</div>
+      <div class="kpi-value green">367.250 Kz</div>
+      <div class="kpi-sub">Apos taxa AGT (6.5%)</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Ja Recebido</div>
+      <div class="kpi-value green">103.250 Kz</div>
+      <div class="kpi-sub">26.7% do total</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Pendente</div>
+      <div class="kpi-value red">86.750 Kz</div>
+      <div class="kpi-sub">2 facturas por receber</div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="chart-container">
+    <div class="section">
+      <h2>Receitas por Evento</h2>
+      <div class="bar-chart">
+        <div class="bar-group">
+          <div class="bar-value">46.7k</div>
+          <div class="bar received" style="height: 120px;"></div>
+          <div class="bar-label">Giants<br>Data</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-value">6.7k</div>
+          <div class="bar pending" style="height: 35px;"></div>
+          <div class="bar-label">Giants<br>B2B</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-value">50k</div>
+          <div class="bar projected" style="height: 130px;"></div>
+          <div class="bar-label">Renovacao<br>Giants</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-value">50k</div>
+          <div class="bar projected" style="height: 130px;"></div>
+          <div class="bar-label">Sona-<br>ngol</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-value">50k</div>
+          <div class="bar projected" style="height: 130px;"></div>
+          <div class="bar-label">BFA</div>
+        </div>
+        <div class="bar-group">
+          <div class="bar-value">150k</div>
+          <div class="bar projected" style="height: 195px;"></div>
+          <div class="bar-label">Acce-<br>lerador</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>Distribuicao</h2>
+      <div class="donut-container">
+        <div class="donut" style="background: conic-gradient(#00ff88 0deg 96deg, #ff4466 96deg 187deg, #00d4ff 187deg 360deg);">
+          <div class="donut-center" style="width: 110px; height: 110px; background: #16162e; border-radius: 50%;">
+            <div class="big">390k</div>
+            <div class="small">Kz Total</div>
+          </div>
+        </div>
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background: #00ff88;"></div> Recebido (103k)</div>
+          <div class="legend-item"><div class="legend-dot" style="background: #ff4466;"></div> Pendente (87k)</div>
+          <div class="legend-item"><div class="legend-dot" style="background: #00d4ff;"></div> Por fazer (200k)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Invoice Table -->
+  <div class="section">
+    <h2>Faturas</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Cliente</th>
+          <th>Bruto</th>
+          <th>AGT (6.5%)</th>
+          <th>Liquido</th>
+          <th>Recebido</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>21 Abr</td>
+          <td>Giants Data</td>
+          <td>50.000 Kz</td>
+          <td>3.250 Kz</td>
+          <td>46.750 Kz</td>
+          <td>6.750 Kz</td>
+          <td><span class="badge badge-pending">Falta 40.000</span></td>
+        </tr>
+        <tr>
+          <td>28 Abr</td>
+          <td>Giants B2B</td>
+          <td>50.000 Kz</td>
+          <td>3.250 Kz</td>
+          <td>46.750 Kz</td>
+          <td>0 Kz</td>
+          <td><span class="badge badge-pending">Falta 46.750</span></td>
+        </tr>
+        <tr>
+          <td>12 Mai</td>
+          <td>Renovacao Giants</td>
+          <td>50.000 Kz</td>
+          <td>3.250 Kz</td>
+          <td>46.750 Kz</td>
+          <td>-</td>
+          <td><span class="badge badge-upcoming">Proximo</span></td>
+        </tr>
+        <tr>
+          <td>21 Mai</td>
+          <td>Sonangol</td>
+          <td>50.000 Kz</td>
+          <td>3.250 Kz</td>
+          <td>46.750 Kz</td>
+          <td>-</td>
+          <td><span class="badge badge-upcoming">Agendado</span></td>
+        </tr>
+        <tr>
+          <td>26 Mai</td>
+          <td>BFA</td>
+          <td>50.000 Kz</td>
+          <td>3.250 Kz</td>
+          <td>46.750 Kz</td>
+          <td>-</td>
+          <td><span class="badge badge-upcoming">Agendado</span></td>
+        </tr>
+        <tr>
+          <td>21-23 Jun</td>
+          <td>Acelerador</td>
+          <td>150.000 Kz</td>
+          <td>9.750 Kz</td>
+          <td>140.250 Kz</td>
+          <td>-</td>
+          <td><span class="badge badge-upcoming">Agendado</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Timeline -->
+  <div class="section">
+    <h2>Timeline de Eventos</h2>
+    <div class="timeline">
+      <div class="timeline-item active">
+        <div class="timeline-date">12 de Maio</div>
+        <div class="timeline-title">Renovacao Giants</div>
+        <div class="timeline-meta">Sala Master | 50.000 Kz</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">21 de Maio</div>
+        <div class="timeline-title">Workshop Sonangol</div>
+        <div class="timeline-meta">Local a definir | 2 turmas | 50.000 Kz</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">26 de Maio</div>
+        <div class="timeline-title">Workshop BFA</div>
+        <div class="timeline-meta">Epic Sana | 50.000 Kz</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">21-23 de Junho</div>
+        <div class="timeline-title">Acelerador Empresarial</div>
+        <div class="timeline-meta">Epic Sana | 3 dias | 150.000 Kz</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="section">
+    <h2>Progresso</h2>
+    <div class="progress-item">
+      <div class="progress-header">
+        <span>Receitas Recebidas</span>
+        <span>103.250 / 390.000 Kz (26.5%)</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 26.5%; background: linear-gradient(to right, #00ff88, #00cc66);"></div>
+      </div>
+    </div>
+    <div class="progress-item">
+      <div class="progress-header">
+        <span>Eventos Realizados</span>
+        <span>2 / 6 (33.3%)</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 33.3%; background: linear-gradient(to right, #00d4ff, #0099cc);"></div>
+      </div>
+    </div>
+    <div class="progress-item">
+      <div class="progress-header">
+        <span>Pendentes por Cobrar</span>
+        <span>86.750 Kz</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 22.2%; background: linear-gradient(to right, #ff4466, #cc3355);"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  EZZO AI Dashboard | Elias Sebastiao | Gerado em 2026-05-08
+</div>
+
+</body>
+</html>
